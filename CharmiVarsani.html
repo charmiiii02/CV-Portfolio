@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charmi Varsani - Salesforce Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page, vertical-scrolling portfolio with a fixed navigation header. The structure is designed to tell a professional story, starting with a summary, visualizing skills with an interactive chart, presenting a career journey through a timeline, and showcasing a filterable project gallery. This non-linear but guided structure allows recruiters to either follow the story or jump directly to the section most relevant to them (e.g., projects), enhancing usability and information discovery. -->
+    <!-- Visualization & Content Choices: 
+        - Summary -> Inform -> Text Block -> Static -> Clear introduction -> HTML/CSS.
+        - Skills -> Organize/Compare -> Polar Area Chart & Tag Cloud -> Hover for details -> Visually represents skill distribution and allows for quick scanning -> Chart.js (Canvas) & HTML/CSS.
+        - Experience -> Show Change -> Vertical Timeline -> Scroll -> Intuitively displays chronological career progression -> HTML/CSS.
+        - Projects -> Organize/Compare -> Filterable Card Grid -> Click to filter -> Allows users to quickly find experience relevant to their needs (e.g., only FSL projects) -> Vanilla JS & HTML/CSS.
+        - Certifications -> Inform -> Simple Cards -> Static -> Clean and direct presentation of qualifications -> HTML/CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: -2.375rem; 
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background-color: #f3f4f6;
+            border: 4px solid #4f46e5;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-slate-800">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-indigo-600">Charmi Varsani</h1>
+                </div>
+                <nav class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#summary" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent hover:border-indigo-600">About</a>
+                        <a href="#skills" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent hover:border-indigo-600">Skills</a>
+                        <a href="#experience" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent hover:border-indigo-600">Experience</a>
+                        <a href="#projects" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent hover:border-indigo-600">Projects</a>
+                        <a href="#contact" class="nav-link text-gray-500 bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Contact</a>
+                    </div>
+                </nav>
+                <div class="md:hidden">
+                    <button id="menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#summary" class="nav-link text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">About</a>
+                <a href="#skills" class="nav-link text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Skills</a>
+                <a href="#experience" class="nav-link text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Experience</a>
+                <a href="#projects" class="nav-link text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Projects</a>
+                <a href="#contact" class="nav-link text-gray-500 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Contact</a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="pt-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <section id="summary" class="py-16">
+                <div class="text-center">
+                    <h2 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">Salesforce Developer</h2>
+                    <p class="mt-6 text-lg leading-8 text-slate-600 max-w-3xl mx-auto">A results-oriented Salesforce Developer with 1.8 years of hands-on experience in configuring and developing scalable solutions across Sales, Service, and Experience Clouds. I am a certified Salesforce AI Associate with foundational knowledge of Einstein Analytics, ready to apply my skills to new challenges.</p>
+                </div>
+            </section>
+            
+            <div class="border-t border-gray-200"></div>
+
+            <section id="skills" class="py-24">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold text-slate-900">Technical Skillset</h2>
+                    <p class="mt-4 text-md text-slate-600 max-w-2xl mx-auto">This chart visualizes my core competencies across different technology domains. My expertise lies in Salesforce Development, balanced with strong skills in various Salesforce Clouds and a growing focus on AI and Analytics.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                    <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
+                        <span class="bg-indigo-100 text-indigo-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Apex</span>
+                        <span class="bg-indigo-100 text-indigo-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">LWC</span>
+                        <span class="bg-indigo-100 text-indigo-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Visualforce</span>
+                        <span class="bg-teal-100 text-teal-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Sales Cloud</span>
+                        <span class="bg-teal-100 text-teal-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Service Cloud</span>
+                        <span class="bg-teal-100 text-teal-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Experience Cloud</span>
+                        <span class="bg-teal-100 text-teal-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">FSL</span>
+                        <span class="bg-teal-100 text-teal-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">SFCC</span>
+                        <span class="bg-amber-100 text-amber-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Einstein Analytics</span>
+                        <span class="bg-amber-100 text-amber-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Salesforce AI</span>
+                        <span class="bg-sky-100 text-sky-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">REST/SOAP APIs</span>
+                        <span class="bg-rose-100 text-rose-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Git</span>
+                        <span class="bg-rose-100 text-rose-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Agile</span>
+                        <span class="bg-rose-100 text-rose-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">CI/CD</span>
+                        <span class="bg-gray-200 text-gray-800 text-sm font-medium me-2 px-3 py-1.5 rounded-full">Salesforce Admin</span>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="border-t border-gray-200"></div>
+
+            <section id="experience" class="py-24">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold text-slate-900">Career Journey</h2>
+                    <p class="mt-4 text-md text-slate-600 max-w-2xl mx-auto">This timeline highlights my professional experience and educational background, showing my progression in the tech industry.</p>
+                </div>
+                <div class="max-w-3xl mx-auto">
+                    <div class="relative border-l-2 border-gray-200 pl-8">
+                        <div class="mb-12 relative timeline-item">
+                            <h3 class="text-lg font-semibold text-slate-900">Salesforce Developer</h3>
+                            <p class="text-indigo-600 font-medium">Qrious Tech Team LLP</p>
+                            <time class="mb-2 text-sm font-normal leading-none text-gray-500">Jan 2024 - Present</time>
+                            <p class="mt-2 text-base font-normal text-gray-600">Developed scalable solutions for Sales, Service, Experience, and FSL projects, built Apex Classes, Triggers, and LWCs, and automated business processes using Flows.</p>
+                        </div>
+                        <div class="mb-12 relative timeline-item">
+                            <h3 class="text-lg font-semibold text-slate-900">Web Developer Intern</h3>
+                            <p class="text-indigo-600 font-medium">QSpider</p>
+                            <time class="mb-2 text-sm font-normal leading-none text-gray-500">June 2023 - Aug 2023</time>
+                            <p class="mt-2 text-base font-normal text-gray-600">Gained foundational knowledge in HTML, JavaScript, and CSS.</p>
+                        </div>
+                         <div class="mb-12 relative timeline-item">
+                            <h3 class="text-lg font-semibold text-slate-900">B.E. Computer Engineering</h3>
+                            <p class="text-indigo-600 font-medium">Sal Institute of Technology and Engineering Research</p>
+                            <time class="mb-2 text-sm font-normal leading-none text-gray-500">Aug 2020 - May 2024</time>
+                        </div>
+                        <div class="relative timeline-item">
+                            <h3 class="text-lg font-semibold text-slate-900">B.Sc. Data Science & Programming</h3>
+                            <p class="text-indigo-600 font-medium">Indian Institute of Technology, Madras</p>
+                            <time class="mb-2 text-sm font-normal leading-none text-gray-500">Jan 2024 - Present</time>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="border-t border-gray-200"></div>
+
+            <section id="projects" class="py-24">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Project Portfolio</h2>
+                    <p class="mt-4 text-md text-slate-600 max-w-2xl mx-auto">Here is a selection of my key projects. Use the filters below to explore my experience with specific Salesforce technologies and see how I've delivered solutions for clients.</p>
+                </div>
+                <div class="flex justify-center space-x-2 mb-12">
+                    <button class="filter-btn bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium" data-filter="all">All</button>
+                    <button class="filter-btn bg-white text-slate-700 px-4 py-2 rounded-full text-sm font-medium border border-gray-300 hover:bg-gray-100" data-filter="fsl">FSL</button>
+                    <button class="filter-btn bg-white text-slate-700 px-4 py-2 rounded-full text-sm font-medium border border-gray-300 hover:bg-gray-100" data-filter="sales">Sales Cloud</button>
+                    <button class="filter-btn bg-white text-slate-700 px-4 py-2 rounded-full text-sm font-medium border border-gray-300 hover:bg-gray-100" data-filter="sfcc">SFCC</button>
+                </div>
+                <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="project-card bg-white p-6 rounded-lg shadow-md border border-gray-200" data-category="fsl">
+                        <h3 class="font-semibold text-lg text-slate-900">CSX Rail Track Management</h3>
+                        <p class="text-indigo-600 text-sm font-medium mb-2">Field Service Lightning</p>
+                        <p class="text-slate-600 text-sm mb-4">Implemented an FSL solution for rail track maintenance, configuring Work Orders, Service Appointments, and Resources.</p>
+                        <div class="flex flex-wrap gap-2">
+                             <span class="bg-gray-200 text-xs px-2 py-1 rounded">Flows</span>
+                             <span class="bg-gray-200 text-xs px-2 py-1 rounded">FSL Mobile</span>
+                        </div>
+                    </div>
+                    <div class="project-card bg-white p-6 rounded-lg shadow-md border border-gray-200" data-category="sales">
+                        <h3 class="font-semibold text-lg text-slate-900">Armakuni CRM Enhancement</h3>
+                        <p class="text-indigo-600 text-sm font-medium mb-2">Sales Cloud</p>
+                        <p class="text-slate-600 text-sm mb-4">Enhanced CRM with AWS ACE Connector and configured Einstein Activity Capture for seamless activity tracking.</p>
+                         <div class="flex flex-wrap gap-2">
+                             <span class="bg-gray-200 text-xs px-2 py-1 rounded">AWS</span>
+                             <span class="bg-gray-200 text-xs px-2 py-1 rounded">Einstein AI</span>
+                        </div>
+                    </div>
+                     <div class="project-card bg-white p-6 rounded-lg shadow-md border border-gray-200" data-category="sfcc">
+                        <h3 class="font-semibold text-lg text-slate-900">E-Commerce Platforms</h3>
+                        <p class="text-indigo-600 text-sm font-medium mb-2">Salesforce Commerce Cloud</p>
+                        <p class="text-slate-600 text-sm mb-4">Led development of an automobile portal and a children's product store, managing catalogs, promotions, and OMS integration.</p>
+                         <div class="flex flex-wrap gap-2">
+                             <span class="bg-gray-200 text-xs px-2 py-1 rounded">Page Designer</span>
+                             <span class="bg-gray-200 text-xs px-2 py-1 rounded">CI/CD</span>
+                             <span class="bg-gray-200 text-xs px-2 py-1 rounded">OMS</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="border-t border-gray-200"></div>
+            
+            <section id="certifications" class="py-24 bg-white">
+                 <div class="text-center">
+                    <h2 class="text-3xl font-bold text-slate-900">Certifications</h2>
+                    <p class="mt-4 text-md text-slate-600 max-w-2xl mx-auto">I am committed to continuous learning and staying current with the latest Salesforce technologies.</p>
+                    <div class="mt-8 flex justify-center items-center gap-8">
+                        <div class="text-center p-6 bg-stone-50 rounded-lg border border-gray-200">
+                             <span class="text-4xl">🏆</span>
+                             <h4 class="text-lg font-semibold mt-2">Salesforce AI Associate</h4>
+                        </div>
+                        <div class="text-center p-6 bg-stone-50 rounded-lg border border-gray-200">
+                             <span class="text-4xl">🏆</span>
+                             <h4 class="text-lg font-semibold mt-2">Agenforce Specialist</h4>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+        </div>
+    
+    </main>
+    
+    <footer id="contact" class="bg-slate-800 text-white">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+             <h2 class="text-2xl font-bold">Get In Touch</h2>
+             <p class="mt-4 text-slate-300">I'm currently seeking new opportunities. Feel free to reach out!</p>
+             <div class="mt-8 flex justify-center space-x-6">
+                <a href="mailto:charmivarsani02@gmail.com" class="text-slate-300 hover:text-indigo-400">charmivarsani02@gmail.com</a>
+                <span class="text-slate-500">|</span>
+                <a href="tel:+919316090407" class="text-slate-300 hover:text-indigo-400">+91-9316090407</a>
+             </div>
+             <p class="mt-8 text-center text-xs text-slate-400">&copy; 2024 Charmi Varsani. Interactive resume built with passion.</p>
+        </div>
+    </footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const skillsData = {
+        labels: ['Development', 'SF Clouds', 'Analytics & AI', 'API & Integration', 'Tools', 'Admin'],
+        datasets: [{
+            label: 'Skill Level',
+            data: [5, 5, 3, 4, 4, 4],
+            backgroundColor: [
+                'rgba(79, 70, 229, 0.7)',
+                'rgba(13, 148, 136, 0.7)',
+                'rgba(217, 119, 6, 0.7)',
+                'rgba(2, 132, 199, 0.7)',
+                'rgba(225, 29, 72, 0.7)',
+                'rgba(107, 114, 128, 0.7)'
+            ],
+            borderColor: [
+                '#4F46E5',
+                '#0D9488',
+                '#D97706',
+                '#0284C7',
+                '#E11D48',
+                '#6B7280'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    const config = {
+        type: 'polarArea',
+        data: skillsData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    pointLabels: {
+                        display: true,
+                        centerPointLabels: true,
+                        font: { size: 14 }
+                    },
+                    ticks: {
+                       display: false,
+                       backdropColor: 'transparent'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                     labels: { font: { size: 12 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label;
+                        }
+                    }
+                }
+            }
+        },
+    };
+
+    const skillsChart = new Chart(
+        document.getElementById('skillsChart'),
+        config
+    );
+
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const filter = button.dataset.filter;
+            
+            filterButtons.forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-700');
+            });
+            button.classList.add('bg-indigo-600', 'text-white');
+            button.classList.remove('bg-white', 'text-slate-700');
+            
+            projectCards.forEach(card => {
+                if (filter === 'all' || card.dataset.category === filter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    const menuButton = document.getElementById('menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('.nav-link').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            if (this.getAttribute('href').startsWith('#')) {
+                 if (window.innerWidth < 768 && !mobileMenu.classList.contains('hidden')) {
+                     mobileMenu.classList.add('hidden');
+                 }
+            }
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>
